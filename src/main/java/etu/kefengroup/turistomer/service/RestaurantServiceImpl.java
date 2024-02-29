@@ -5,7 +5,6 @@ import etu.kefengroup.turistomer.entity.Restaurant;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
