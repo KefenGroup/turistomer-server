@@ -3,6 +3,8 @@ package etu.kefengroup.turistomer.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter @Setter @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
@@ -11,7 +13,7 @@ import lombok.*;
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="hotel_id")
+    @Column(name="id")
     private int id;
 
     @Column(name="name")
@@ -27,7 +29,7 @@ public class Hotel {
     private String link;
 
     @Column(name="rating")
-    private int rating = -1;        //default value for rating is -1
+    private float rating = -1;        //default value for rating is -1
 
     @Column(name="price")
     private int price = -1;    //default value for price is -1
@@ -38,8 +40,8 @@ public class Hotel {
     @Column(name="latitude")
     private float latitude;
 
-    @Column(name="address")
-    private String address;
-
-    //TODO define suitable constructors
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "Hotel_Amenity", joinColumns = @JoinColumn(name = "hotel_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id"))
+    private Set<Amenity> amenities;
 }
