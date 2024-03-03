@@ -3,6 +3,8 @@ package etu.kefengroup.turistomer.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter @Setter @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
@@ -35,37 +37,29 @@ public class Restaurant {
     @Column(name="price_higher")
     private int priceHigher = -1;
 
-    //@Column(name="longitude")
-    //private float longitude;
+    @Column(name="price_type")
+    private String priceType;
 
-    //@Column(name="latitude")
-    //private float latitude;
+    @Column(name="longitude")
+    private float longitude = -1.0f;
 
-    //@Column(name="address")
-    //private String address;
+    @Column(name="latitude")
+    private float latitude = -1.0f;
 
-    public Restaurant(String city, String link, String name, int rating) {
-        this(city, link, name);
-        this.rating = rating;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "Restaurant_Cuisine", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "cuisine_id"))
+    private Set<Cuisine> cuisines;
 
-    public Restaurant(String city, String link, String name, int priceLower, int priceHigher) {
-        this(city, link, name);
-        this.priceLower = priceLower;
-        this.priceHigher = priceHigher;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "Restaurant_Meal", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "meal_id"))
+    private Set<Meal> meals;
 
-    public Restaurant(String city, String link, String name, int rating, int priceLower, int priceHigher) {
-        this(city, link, name, priceLower, priceHigher);
-        this.rating = rating;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "Restaurant_Purpose", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "purpose_id"))
+    private Set<Purpose> purposes;
 
-//    public Restaurant(String city, String link, String name,
-//                      int rating, int priceLower, int priceHigher,
-//                      float longitude, float latitude, String address) {
-//        this(city, link, name, rating, priceLower, priceHigher);
-//        this.longitude = longitude;
-//        this.latitude = latitude;
-//        this.address = address;
-//    }
+
 }

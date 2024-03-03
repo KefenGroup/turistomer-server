@@ -3,6 +3,8 @@ package etu.kefengroup.turistomer.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter @Setter @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
@@ -38,4 +40,8 @@ public class Hotel {
     @Column(name="latitude")
     private float latitude;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "Hotel_Amenity", joinColumns = @JoinColumn(name = "hotel_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id"))
+    private Set<Amenity> amenities;
 }
