@@ -18,6 +18,12 @@ public class RestaurantRestController {
         this.restaurantService = restaurantService;
     }
 
+    @GetMapping("/restaurants/{no}/{size}")
+    public List<Restaurant> getRestaurantList(@PathVariable int no,
+                                      @PathVariable int size) {
+        return restaurantService.findByPage(no, size);
+    }
+
     @GetMapping("/restaurants")
     public List<Restaurant> findAll(){
         return restaurantService.findAll();
