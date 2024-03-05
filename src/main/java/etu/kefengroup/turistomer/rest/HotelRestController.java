@@ -18,6 +18,12 @@ public class HotelRestController {
         this.hotelService = hotelService;
     }
 
+    @GetMapping("/hotels/{no}/{size}")
+    public List<Hotel> getHotelList(@PathVariable int no,
+                                              @PathVariable int size) {
+        return hotelService.findByPage(no, size);
+    }
+
     @GetMapping("/hotels")
     public List<Hotel> findAll(){
         return hotelService.findAll();
