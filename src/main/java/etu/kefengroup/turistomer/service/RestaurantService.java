@@ -8,6 +8,8 @@ public interface RestaurantService {
 
     List<Restaurant> findAll();
 
+    List<Restaurant> findByPage(int no, int size);
+
     Restaurant findById(int id);
 
     Restaurant save(Restaurant restaurant);

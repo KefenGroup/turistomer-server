@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class HotelRestController {
 
@@ -16,6 +17,12 @@ public class HotelRestController {
     @Autowired
     public HotelRestController(HotelService hotelService) {
         this.hotelService = hotelService;
+    }
+
+    @GetMapping("/hotels/{no}/{size}")
+    public List<Hotel> getHotelList(@PathVariable int no,
+                                              @PathVariable int size) {
+        return hotelService.findByPage(no, size);
     }
 
     @GetMapping("/hotels")
