@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
+@RequestMapping("${entity.api.path}")
 public class HotelRestController {
 
     private HotelService hotelService;
