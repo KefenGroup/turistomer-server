@@ -1,14 +1,19 @@
-package etu.kefengroup.turistomer.entity.model;
+    package etu.kefengroup.turistomer.entity.model;
 
-import lombok.*;
+    import lombok.*;
 
-import java.util.List;
+    import java.util.List;
 
-@Getter @Setter
-@AllArgsConstructor
-public class Prediction {
-    private String type;
-    private List<String> entity;
-    private List<Integer> position;
-    private List<Float> probability;
-}
+    @Getter @Setter
+    @AllArgsConstructor
+    public class Prediction {
+        private List<String> cuisine;
+        private List<String> location;
+        private List<String> meal;
+        private List<Integer> isClose;
+        private List<String> price;
+        private List<Integer> isCheap;
+        private List<Integer> isExpensive;
+        private List<String> amenity;
+        private List<String> rating;
+    }

@@ -1,6 +1,7 @@
 package etu.kefengroup.turistomer.rest;
 
 import etu.kefengroup.turistomer.entity.model.Prediction;
+import etu.kefengroup.turistomer.entity.model.Prompt;
 import etu.kefengroup.turistomer.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ModelRestController {
     }
 
     @PostMapping
-    public List<Prediction> getPrompt(@RequestBody String prompt){
+    public Prediction getPrompt(@RequestBody Prompt prompt){
         return modelService.sendPromptToModel(prompt);
     }
 }

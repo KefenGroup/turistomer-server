@@ -24,10 +24,15 @@ public class ModelService {
         this.restTemplate = restTemplate;
     }
 
-    public List<Prediction> sendPromptToModel(String prompt){
-        Prompt input = new Prompt(prompt);
-        HttpEntity<Prompt> requestEntity = new HttpEntity<>(input);
-        ResponseEntity<List> response = restTemplate.exchange(modelApiUrl, HttpMethod.POST, requestEntity, List.class);
-        return (List<Prediction>)response.getBody();
+    public Prediction sendPromptToModel(Prompt prompt){
+        HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
+        ResponseEntity<Prediction> response = restTemplate.exchange(
+                modelApiUrl,
+                HttpMethod.POST,
+                requestEntity,
+                Prediction.class
+        );
+
+        return response.getBody();
     }
 }
