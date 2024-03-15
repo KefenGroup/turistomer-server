@@ -7,6 +7,7 @@ import TuristOmerSimilarityModel as sim
 
 class PromptInput(BaseModel):
     prompt: str
+    type: str
 
 class EntityPrediction(BaseModel):
     type: str
@@ -32,8 +33,9 @@ app = FastAPI()
 @app.post("/predict", response_model=EntityResponseModel)
 async def predict(input_prompt: PromptInput):
     prompt_text = input_prompt.prompt
+    prompt_type = input_prompt.type
     prediction = get_prediction(prompt_text)
-    similarity_dict = get_similar_by_category(prediction)
+    similarity_dict = get_similar_by_category(prediction, prompt_type)
 
     response_data = {
         "cuisine": similarity_dict.get("cuisine"),
@@ -57,11 +59,11 @@ def get_prediction(prompt:str):
     return prediction['entity_prediction'][0]
 
 
-def get_similar_by_category(prediction: List[EntityPrediction]):
+def get_similar_by_category(prediction: List[EntityPrediction], type):
     similarities = {}
     for entity in prediction:
         print(entity)
-        curr_entity_dict = sim.get_similarities(entity)
+        curr_entity_dict = sim.get_similarities(entity, type)
         if curr_entity_dict is not None:
             similarities = merge_dicts(similarities, curr_entity_dict)
 

@@ -1,4 +1,5 @@
 import spacy
+import Levenshtein
 
 nlp = spacy.load('en_core_web_lg')
 
@@ -15,8 +16,9 @@ near_list = ["nearby", "near", "close", "neighboring", "around me", "close to my
 cheap_list = ["cheap", "economical", "affordable" ,"low cost", "low priced"]
 expensive_list = ["expensive", "luxurious", "costly", "high cost", "overpriced"]
 meal_list = ["breakfast", "dinner", "lunch", "brunch"]
+city_list = ["Nevşehir","Bursa","Çanakkale","İzmir","Antalya","Ankara","Aydın","Balıkesir","Muğla","Istanbul"]
 
-def get_similarities(entity, threshold=0.7):
+def get_similarities(entity, type, threshold=0.7):
     entity_type = entity['type']
     if entity_type in ['Cuisine', 'Dish']:
         return get_similarity_for_cuisine(entity, threshold)
@@ -27,7 +29,7 @@ def get_similarities(entity, threshold=0.7):
     elif entity_type == 'Hours':
         return get_similarity_for_meal(entity, threshold=0.9)
     elif entity_type == 'Amenity':
-        return get_similarity_for_amenity(entity, is_restaurant=True, threshold=0.6)
+        return get_similarity_for_amenity(entity, type, threshold=0.6)
     elif entity_type == 'Rating':
         return {"rating": ' '.join(entity['entity'])}
 
@@ -40,7 +42,8 @@ def get_similarity_for_location(entity, threshold=0.7):
     loc_str = ' '.join(entity['entity'])
     loc_name = nlp(loc_str.lower())
     is_close = any(loc_name.similarity(nlp(loc.lower())) >= threshold for loc in near_list)
-    return {"location": str(loc_name), "is_close": int(is_close)}
+    similar_city = [word for word in city_list if Levenshtein.distance(loc_str, word) < 2]
+    return {"location": similar_city, "is_close": int(is_close)}
 
 def get_similarity_for_price(entity, threshold=0.9):
     price_str = ' '.join(entity['entity'])
@@ -54,9 +57,9 @@ def get_similarity_for_meal(entity, threshold=0.9):
     similar_meals = [meal for meal in meal_list if nlp(meal_str.lower()).similarity(nlp(meal.lower())) >= threshold]
     return {"meal": similar_meals}
 
-def get_similarity_for_amenity(entity, is_restaurant, threshold=0.9):
+def get_similarity_for_amenity(entity, type, threshold=0.9):
     amenity_str = ' '.join(entity['entity'])
     amenity_name = nlp(amenity_str.lower())
-    amenities = amenity_list if not is_restaurant else ["big group", "romantic"]
+    amenities = amenity_list if type=='hotel' else ["big group", "romantic"]
     similar_amenities = [amenity for amenity in amenities if amenity_name.similarity(nlp(amenity.lower())) >= threshold]
     return {"amenity": similar_amenities}
