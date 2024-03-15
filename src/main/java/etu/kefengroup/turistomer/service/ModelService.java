@@ -1,5 +1,6 @@
 package etu.kefengroup.turistomer.service;
 
+import etu.kefengroup.turistomer.entity.RecommendationEntity;
 import etu.kefengroup.turistomer.entity.model.Prediction;
 import etu.kefengroup.turistomer.entity.model.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +13,21 @@ import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
+
 @Service
 public class ModelService {
 
     @Value("${model.api.url}")
     private String modelApiUrl;
     private final RestTemplate restTemplate;
+    private final HotelService hotelService;
+    private final RestaurantService restaurantService;
 
     @Autowired
-    public ModelService(RestTemplate restTemplate) {
+    public ModelService(RestTemplate restTemplate, HotelService hotelService, RestaurantService restaurantService) {
         this.restTemplate = restTemplate;
+        this.hotelService = hotelService;
+        this.restaurantService = restaurantService;
     }
 
     public Prediction sendPromptToModel(Prompt prompt){
@@ -35,4 +41,12 @@ public class ModelService {
 
         return response.getBody();
     }
+
+    public List<? extends RecommendationEntity> getRestaurantRecommendations(Prediction prediction){
+        return restaurantService.findByPrediction(prediction);
+    }
+
+//    public List<? extends RecommendationEntity> getHotelRecommendations(Prediction prediction){
+//        return null;
+//    }
 }

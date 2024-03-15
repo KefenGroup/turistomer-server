@@ -1,6 +1,7 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.entity.Restaurant;
+import etu.kefengroup.turistomer.entity.model.Prediction;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface RestaurantService {
     Restaurant save(Restaurant restaurant);
 
     void deleteById(int id);
+
+    List<Restaurant> findByPrediction(Prediction prediction);
 }

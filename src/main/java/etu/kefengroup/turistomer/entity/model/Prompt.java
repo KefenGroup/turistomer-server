@@ -7,4 +7,5 @@ import lombok.*;
 @NoArgsConstructor
 public class Prompt {
     private String prompt;
+    private String type;
 }

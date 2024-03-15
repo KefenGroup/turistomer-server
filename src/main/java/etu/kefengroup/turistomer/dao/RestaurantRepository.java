@@ -1,7 +1,9 @@
 package etu.kefengroup.turistomer.dao;
 
 import etu.kefengroup.turistomer.entity.Restaurant;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,4 +16,13 @@ public interface RestaurantRepository extends PagingAndSortingRepository<Restaur
     Restaurant save(Restaurant restaurant);
 
     void deleteById(int id);
+
+    @Query("SELECT DISTINCT r FROM Restaurant r " +
+            "JOIN r.cuisines c " +
+            "WHERE c.name IN :cuisineNames " +
+            "OR LOWER(r.name) LIKE LOWER(CONCAT('%', :partialCuisineName, '%'))")
+    List<Restaurant> findRestaurantsByCuisineNames(@Param("cuisineNames") List<String> cuisineNames, @Param("partialCuisineName") String partialCuisineName);
+
+    @Query("SELECT r FROM Restaurant r WHERE r.city in :cityList")
+    List<Restaurant> findRestaurantsByCityList(@Param("cityList") List<String> cityList);
 }
