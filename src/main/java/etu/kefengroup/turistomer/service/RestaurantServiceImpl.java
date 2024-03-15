@@ -87,6 +87,15 @@ public class RestaurantServiceImpl implements RestaurantService{
             findByPredictionPurposeHelper(prediction.getAmenity());
         }
 
+        if(prediction.getIsCheap() != null && prediction.getIsCheap().contains(1)
+                && (prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1))){
+            findByPredictionCheapHelper(300);
+        }
+
+        if(prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1)){
+            findByPredictionExpensiveHelper(1200);
+        }
+
         return restaurantRecommendations;
     }
 
@@ -124,6 +133,22 @@ public class RestaurantServiceImpl implements RestaurantService{
                 .filter(restaurant -> purposes.stream()
                         .anyMatch(purpose -> restaurant.getPurposes().stream()
                                 .anyMatch(restaurantAmenity -> restaurantAmenity.getName().equalsIgnoreCase(purpose))))
+                .collect(Collectors.toList());
+    }
+
+    private void findByPredictionCheapHelper(int higherThreshold) {
+        restaurantRecommendations = restaurantRecommendations.stream()
+                .filter(restaurant -> (
+                        (restaurant.getPriceHigher() != -1 && restaurant.getPriceHigher() < higherThreshold)
+                        || (restaurant.getPriceType().equals("cheap") || restaurant.getPriceType().equals("average"))))
+                .collect(Collectors.toList());
+    }
+
+    private void findByPredictionExpensiveHelper(int lowerThreshold) {
+        restaurantRecommendations = restaurantRecommendations.stream()
+                .filter(restaurant ->
+                        (restaurant.getPriceLower() != -1 && restaurant.getPriceLower() > lowerThreshold)
+                        || (restaurant.getPriceType().equals("expensive") || restaurant.getPriceType().equals("average")))
                 .collect(Collectors.toList());
     }
 }
