@@ -77,6 +77,15 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
 
         //TODO eğer location veya cuisine verilmediyse yakındakiler önerilere eklenecek
+        // is_close attribute'u da burada implement edilmeli
+
+        if(prediction.getMeal() != null && prediction.getMeal().contains("breakfast")){
+            findByPredictionMealHelper(prediction.getMeal());
+        }
+
+        if(prediction.getAmenity() != null){
+            findByPredictionPurposeHelper(prediction.getAmenity());
+        }
 
         return restaurantRecommendations;
     }
@@ -96,10 +105,25 @@ public class RestaurantServiceImpl implements RestaurantService{
             restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByCityList(locations));
         }
         else{
-            restaurantRecommendations =restaurantRecommendations.stream()
+            restaurantRecommendations = restaurantRecommendations.stream()
                     .filter(restaurant -> locations.stream()
                             .anyMatch(city -> restaurant.getCity().equals(city)))
                     .collect(Collectors.toList());
         }
+    }
+
+    private void findByPredictionMealHelper(List<String> meals) {
+        restaurantRecommendations = restaurantRecommendations.stream()
+                .filter(restaurant -> restaurant.getMeals().stream()
+                        .anyMatch(meal -> meal.getName().equalsIgnoreCase("breakfast") || meal.getName().equalsIgnoreCase("brunch")))
+                .collect(Collectors.toList());
+    }
+
+    private void findByPredictionPurposeHelper(List<String> purposes) {
+        restaurantRecommendations = restaurantRecommendations.stream()
+                .filter(restaurant -> purposes.stream()
+                        .anyMatch(purpose -> restaurant.getPurposes().stream()
+                                .anyMatch(restaurantAmenity -> restaurantAmenity.getName().equalsIgnoreCase(purpose))))
+                .collect(Collectors.toList());
     }
 }
