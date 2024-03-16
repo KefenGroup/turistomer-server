@@ -5,9 +5,14 @@ from pydantic import BaseModel
 import uvicorn
 import TuristOmerSimilarityModel as sim
 
+class Coordinates(BaseModel):
+    longitude: float
+    latitude: float
+
 class PromptInput(BaseModel):
     prompt: str
     type: str
+    coordinates: Coordinates
 
 class EntityPrediction(BaseModel):
     type: str
