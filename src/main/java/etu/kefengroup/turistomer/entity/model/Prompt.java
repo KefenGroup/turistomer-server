@@ -8,4 +8,6 @@ import lombok.*;
 public class Prompt {
     private String prompt;
     private String type;
+    private Coordinates coordinates;
+
 }

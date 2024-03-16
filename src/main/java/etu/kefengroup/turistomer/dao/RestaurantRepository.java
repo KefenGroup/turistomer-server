@@ -25,4 +25,14 @@ public interface RestaurantRepository extends PagingAndSortingRepository<Restaur
 
     @Query("SELECT r FROM Restaurant r WHERE r.city in :cityList")
     List<Restaurant> findRestaurantsByCityList(@Param("cityList") List<String> cityList);
+
+    @Query("SELECT r FROM Restaurant r " +
+            "WHERE r.longitude BETWEEN :minLongitude AND :maxLongitude " +
+            "AND r.latitude BETWEEN :minLatitude AND :maxLatitude")
+    List<Restaurant> findRestaurantsByLocationRange(@Param("minLongitude") double minLongitude,
+                                                    @Param("maxLongitude") double maxLongitude,
+                                                    @Param("minLatitude") double minLatitude,
+                                                    @Param("maxLatitude") double maxLatitude);
+
+
 }

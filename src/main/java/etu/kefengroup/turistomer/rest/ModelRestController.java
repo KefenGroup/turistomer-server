@@ -25,7 +25,7 @@ public class ModelRestController {
     public List<? extends RecommendationEntity> getPrompt(@RequestBody Prompt prompt){
         Prediction prediction = modelService.sendPromptToModel(prompt);
         if(prompt.getType().equals("restaurant")){
-            return modelService.getRestaurantRecommendations(prediction);
+            return modelService.getRestaurantRecommendations(prediction, prompt.getCoordinates());
         }else if (prompt.getType().equals("hotel")){
             return null;
         }

@@ -2,9 +2,11 @@ package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.dao.RestaurantRepository;
 import etu.kefengroup.turistomer.entity.Restaurant;
+import etu.kefengroup.turistomer.entity.model.Coordinates;
 import etu.kefengroup.turistomer.entity.model.Prediction;
 import etu.kefengroup.turistomer.utils.EnglishToTurkishMappings;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
+import etu.kefengroup.turistomer.utils.GeoLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,7 +67,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public List<Restaurant> findByPrediction(Prediction prediction) {
+    public List<Restaurant> findByPrediction(Prediction prediction, Coordinates coordinates) {
         restaurantRecommendations = new ArrayList<>();
 
         if(prediction.getCuisine() != null){
@@ -76,8 +78,9 @@ public class RestaurantServiceImpl implements RestaurantService{
             findByPredictionLocationHelper(prediction.getLocation());
         }
 
-        //TODO eğer location veya cuisine verilmediyse yakındakiler önerilere eklenecek
-        // is_close attribute'u da burada implement edilmeli
+        if(prediction.getIsClose() != null && prediction.getIsClose().contains(1)){
+            findByPredictionCloseHelper(coordinates);
+        }
 
         if(prediction.getMeal() != null && prediction.getMeal().contains("breakfast")){
             findByPredictionMealHelper(prediction.getMeal());
@@ -117,6 +120,26 @@ public class RestaurantServiceImpl implements RestaurantService{
             restaurantRecommendations = restaurantRecommendations.stream()
                     .filter(restaurant -> locations.stream()
                             .anyMatch(city -> restaurant.getCity().equals(city)))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private void findByPredictionCloseHelper(Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),2);
+
+        System.out.println(coordinates.getLatitude() + " " + coordinates.getLongitude());
+        System.out.println(range);
+
+        if(restaurantRecommendations.isEmpty()){
+            restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByLocationRange(
+                    range.getMinLongitude(),range.getMaxLongitude(),
+                    range.getMinLatitude(), range.getMaxLatitude()
+            ));
+        }
+        else{
+            restaurantRecommendations =restaurantRecommendations.stream()
+                    .filter(restaurant -> restaurant.getLatitude() >= range.getMinLatitude() && restaurant.getLatitude() <= range.getMaxLatitude() &&
+                            restaurant.getLongitude() >= range.getMinLongitude() && restaurant.getLongitude() <= range.getMaxLongitude())
                     .collect(Collectors.toList());
         }
     }

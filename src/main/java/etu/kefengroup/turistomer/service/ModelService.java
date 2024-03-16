@@ -1,6 +1,7 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.entity.RecommendationEntity;
+import etu.kefengroup.turistomer.entity.model.Coordinates;
 import etu.kefengroup.turistomer.entity.model.Prediction;
 import etu.kefengroup.turistomer.entity.model.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,8 @@ public class ModelService {
         return response.getBody();
     }
 
-    public List<? extends RecommendationEntity> getRestaurantRecommendations(Prediction prediction){
-        return restaurantService.findByPrediction(prediction);
+    public List<? extends RecommendationEntity> getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
+        return restaurantService.findByPrediction(prediction, coordinates);
     }
 
 //    public List<? extends RecommendationEntity> getHotelRecommendations(Prediction prediction){

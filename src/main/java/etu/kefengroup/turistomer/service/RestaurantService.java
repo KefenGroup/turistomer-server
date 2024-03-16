@@ -1,6 +1,7 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.entity.Restaurant;
+import etu.kefengroup.turistomer.entity.model.Coordinates;
 import etu.kefengroup.turistomer.entity.model.Prediction;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface RestaurantService {
 
     void deleteById(int id);
 
-    List<Restaurant> findByPrediction(Prediction prediction);
+    List<Restaurant> findByPrediction(Prediction prediction, Coordinates coordinates);
 }
