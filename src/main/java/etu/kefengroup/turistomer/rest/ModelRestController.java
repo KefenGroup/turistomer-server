@@ -27,7 +27,7 @@ public class ModelRestController {
         if(prompt.getType().equals("restaurant")){
             return modelService.getRestaurantRecommendations(prediction, prompt.getCoordinates());
         }else if (prompt.getType().equals("hotel")){
-            return null;
+            return modelService.getHotelRecommendations(prediction, prompt.getCoordinates());
         }
 
         return null;

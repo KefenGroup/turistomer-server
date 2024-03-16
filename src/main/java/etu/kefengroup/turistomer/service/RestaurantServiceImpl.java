@@ -110,8 +110,8 @@ public class RestaurantServiceImpl implements RestaurantService{
     private List<Restaurant> findByPredictionCuisineHelper(List<String> cuisines){
         List<String> turkishList = new ArrayList<>();
         for(String c : cuisines){
-            if(EnglishToTurkishMappings.englishToTurkishMap.get(c) != null)
-                turkishList.add(EnglishToTurkishMappings.englishToTurkishMap.get(c));
+            if(EnglishToTurkishMappings.englishToTurkishCuisineMap.get(c) != null)
+                turkishList.add(EnglishToTurkishMappings.englishToTurkishCuisineMap.get(c));
         }
 
         return restaurantRepository.findRestaurantsByCuisineNames(turkishList, cuisines.get(0));

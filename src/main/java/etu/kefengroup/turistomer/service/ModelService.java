@@ -47,7 +47,7 @@ public class ModelService {
         return restaurantService.findByPrediction(prediction, coordinates);
     }
 
-//    public List<? extends RecommendationEntity> getHotelRecommendations(Prediction prediction){
-//        return null;
-//    }
+    public List<? extends RecommendationEntity> getHotelRecommendations(Prediction prediction, Coordinates coordinates){
+        return hotelService.findByPrediction(prediction, coordinates);
+    }
 }
