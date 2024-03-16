@@ -15,4 +15,6 @@ public interface HotelService {
     Hotel save(Hotel hotel);
 
     void deleteById(int id);
+
+    int getCount();
 }

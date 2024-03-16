@@ -18,5 +18,7 @@ public interface RestaurantService {
 
     void deleteById(int id);
 
+    int getCount();
+
     List<Restaurant> findByPrediction(Prediction prediction, Coordinates coordinates);
 }

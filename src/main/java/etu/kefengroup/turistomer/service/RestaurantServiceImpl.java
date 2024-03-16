@@ -67,6 +67,11 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
+    public int getCount() {
+        return restaurantRepository.count();
+    }
+
+    @Override
     public List<Restaurant> findByPrediction(Prediction prediction, Coordinates coordinates) {
         restaurantRecommendations = new ArrayList<>();
 
@@ -126,9 +131,6 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     private void findByPredictionCloseHelper(Coordinates coordinates) {
         GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),2);
-
-        System.out.println(coordinates.getLatitude() + " " + coordinates.getLongitude());
-        System.out.println(range);
 
         if(restaurantRecommendations.isEmpty()){
             restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByLocationRange(

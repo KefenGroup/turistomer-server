@@ -57,4 +57,9 @@ public class HotelServiceImpl implements HotelService{
     public void deleteById(int id) {
         hotelRepository.deleteById(id);
     }
+
+    @Override
+    public int getCount() {
+        return hotelRepository.count();
+    }
 }

@@ -17,6 +17,8 @@ public interface RestaurantRepository extends PagingAndSortingRepository<Restaur
 
     void deleteById(int id);
 
+    int count();
+
     @Query("SELECT DISTINCT r FROM Restaurant r " +
             "JOIN r.cuisines c " +
             "WHERE c.name IN :cuisineNames " +

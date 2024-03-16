@@ -30,6 +30,11 @@ public class RestaurantRestController {
         return restaurantService.findAll();
     }
 
+    @GetMapping("/restaurants/count")
+    public int getCount(){
+        return restaurantService.getCount();
+    }
+
     @GetMapping("/restaurants/{restaurantId}")
     public Restaurant getRestaurant(@PathVariable int restaurantId){
         Restaurant restaurant = restaurantService.findById(restaurantId);

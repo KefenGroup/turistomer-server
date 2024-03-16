@@ -30,6 +30,11 @@ public class HotelRestController {
         return hotelService.findAll();
     }
 
+    @GetMapping("/hotels/count")
+    public int getCount(){
+        return hotelService.getCount();
+    }
+
     @GetMapping("/hotels/{hotelId}")
     public Hotel getHotel(@PathVariable int hotelId){
         Hotel hotel = hotelService.findById(hotelId);

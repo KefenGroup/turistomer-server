@@ -14,4 +14,6 @@ public interface HotelRepository extends PagingAndSortingRepository<Hotel, Integ
     Hotel save(Hotel restaurant);
 
     void deleteById(int id);
+
+    int count();
 }
