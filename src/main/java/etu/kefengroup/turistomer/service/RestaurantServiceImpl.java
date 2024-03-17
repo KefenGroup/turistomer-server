@@ -83,7 +83,8 @@ public class RestaurantServiceImpl implements RestaurantService{
             findByPredictionLocationHelper(prediction.getLocation());
         }
 
-        if(prediction.getIsClose() != null && prediction.getIsClose().contains(1)){
+        if((prediction.getCuisine() == null && prediction.getLocation() == null)
+                || (prediction.getIsClose() != null && prediction.getIsClose().contains(1))){
             findByPredictionCloseHelper(coordinates);
         }
 
