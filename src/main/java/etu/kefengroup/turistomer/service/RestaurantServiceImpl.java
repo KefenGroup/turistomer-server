@@ -79,7 +79,7 @@ public class RestaurantServiceImpl implements RestaurantService{
             restaurantRecommendations.addAll(findByPredictionCuisineHelper(prediction.getCuisine()));
         }
 
-        if(prediction.getIsClose() != null && !prediction.getIsClose().contains(1)){
+        if(prediction.getLocation() != null && prediction.getIsClose() != null && !prediction.getIsClose().contains(1)){
             findByPredictionLocationHelper(prediction.getLocation());
         }
 
@@ -166,7 +166,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurantRecommendations = restaurantRecommendations.stream()
                 .filter(restaurant -> (
                         (restaurant.getPriceHigher() != -1 && restaurant.getPriceHigher() < higherThreshold)
-                        || (restaurant.getPriceType().equals("cheap") || restaurant.getPriceType().equals("average"))))
+                        || !restaurant.getPriceType().equals("expensive")))
                 .collect(Collectors.toList());
     }
 
@@ -174,7 +174,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurantRecommendations = restaurantRecommendations.stream()
                 .filter(restaurant ->
                         (restaurant.getPriceLower() != -1 && restaurant.getPriceLower() > lowerThreshold)
-                        || (restaurant.getPriceType().equals("expensive") || restaurant.getPriceType().equals("average")))
+                        || !restaurant.getPriceType().equals("cheap"))
                 .collect(Collectors.toList());
     }
 }
