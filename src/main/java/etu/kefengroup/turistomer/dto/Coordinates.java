@@ -1,4 +1,4 @@
-package etu.kefengroup.turistomer.entity.model;
+package etu.kefengroup.turistomer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

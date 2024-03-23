@@ -1,9 +1,10 @@
 package etu.kefengroup.turistomer.service;
 
+import etu.kefengroup.turistomer.dto.TranslatorResponse;
 import etu.kefengroup.turistomer.entity.RecommendationEntity;
-import etu.kefengroup.turistomer.entity.model.Coordinates;
-import etu.kefengroup.turistomer.entity.model.Prediction;
-import etu.kefengroup.turistomer.entity.model.Prompt;
+import etu.kefengroup.turistomer.dto.Coordinates;
+import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,14 +25,21 @@ public class ModelService {
     private final HotelService hotelService;
     private final RestaurantService restaurantService;
 
+    private final TranslatorService translatorService;
+
     @Autowired
-    public ModelService(RestTemplate restTemplate, HotelService hotelService, RestaurantService restaurantService) {
+    public ModelService(RestTemplate restTemplate, HotelService hotelService, RestaurantService restaurantService, TranslatorService translatorService) {
         this.restTemplate = restTemplate;
         this.hotelService = hotelService;
         this.restaurantService = restaurantService;
+        this.translatorService = translatorService;
     }
 
     public Prediction sendPromptToModel(Prompt prompt){
+        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
+        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
+        prompt.setPrompt(englishPromptAsString);
+
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
         ResponseEntity<Prediction> response = restTemplate.exchange(
                 modelApiUrl,

@@ -1,8 +1,8 @@
 package etu.kefengroup.turistomer.rest;
 
 import etu.kefengroup.turistomer.entity.RecommendationEntity;
-import etu.kefengroup.turistomer.entity.model.Prediction;
-import etu.kefengroup.turistomer.entity.model.Prompt;
+import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Prompt;
 import etu.kefengroup.turistomer.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
