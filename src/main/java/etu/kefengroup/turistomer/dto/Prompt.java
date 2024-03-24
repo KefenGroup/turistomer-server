@@ -4,6 +4,7 @@ import lombok.*;
 
 @Getter @Setter
 @AllArgsConstructor
+@ToString
 @NoArgsConstructor
 public class Prompt {
     private String prompt;

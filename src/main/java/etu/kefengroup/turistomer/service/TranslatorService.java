@@ -33,7 +33,7 @@ public class TranslatorService {
     private String apiUrl;
 
     public TranslatorResponse translatePrompt(String prompt) {
-        String processedPrompt = "Translate the following text into English: " + prompt;
+        String processedPrompt = "Translate the following text into English unless it is in English: " + prompt;
         TranslatorRequest request = new TranslatorRequest(model,
                 List.of(new TranslatorMessage("user", processedPrompt)),
                 maxCompletions,

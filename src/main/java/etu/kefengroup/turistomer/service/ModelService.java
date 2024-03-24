@@ -5,6 +5,7 @@ import etu.kefengroup.turistomer.entity.RecommendationEntity;
 import etu.kefengroup.turistomer.dto.Coordinates;
 import etu.kefengroup.turistomer.dto.Prediction;
 import etu.kefengroup.turistomer.dto.Prompt;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 public class ModelService {
 
     @Value("${model.api.url}")
@@ -38,6 +40,8 @@ public class ModelService {
     public Prediction sendPromptToModel(Prompt prompt){
         TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
         String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
+        log.info("Translated Prompt: " + englishPromptAsString);
+
         prompt.setPrompt(englishPromptAsString);
 
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
@@ -48,6 +52,7 @@ public class ModelService {
                 Prediction.class
         );
 
+        log.info("Prediction response: " + response.getBody());
         return response.getBody();
     }
 

@@ -5,6 +5,7 @@
     import java.util.List;
 
     @Getter @Setter
+    @ToString
     @AllArgsConstructor
     public class Prediction {
         private List<String> cuisine;
