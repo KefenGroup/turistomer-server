@@ -1,8 +1,8 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.entity.Restaurant;
-import etu.kefengroup.turistomer.entity.model.Coordinates;
-import etu.kefengroup.turistomer.entity.model.Prediction;
+import etu.kefengroup.turistomer.dto.Coordinates;
+import etu.kefengroup.turistomer.dto.Prediction;
 
 import java.util.List;
 

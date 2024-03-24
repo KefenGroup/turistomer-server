@@ -1,13 +1,9 @@
 package etu.kefengroup.turistomer.utils;
 
-import etu.kefengroup.turistomer.entity.model.Coordinates;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GeoLocation {
 

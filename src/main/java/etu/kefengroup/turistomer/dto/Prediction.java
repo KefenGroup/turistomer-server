@@ -1,10 +1,11 @@
-    package etu.kefengroup.turistomer.entity.model;
+    package etu.kefengroup.turistomer.dto;
 
     import lombok.*;
 
     import java.util.List;
 
     @Getter @Setter
+    @ToString
     @AllArgsConstructor
     public class Prediction {
         private List<String> cuisine;
