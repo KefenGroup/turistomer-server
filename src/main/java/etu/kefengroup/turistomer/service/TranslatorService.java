@@ -32,8 +32,14 @@ public class TranslatorService {
     @Value("${openai.chatgpt.api.url}")
     private String apiUrl;
 
+    // TODO handle preprompt to work as expected
+    private final String prepromptForTranslation = "Please ignore all previous instructions. " +
+            "Please respond only in English. Do not explain what you are doing. Do not self reference. You are an expert translator. "+
+            "Do not change the text if it is in English" +
+            "Translate the following text to English:\n";
+
     public TranslatorResponse translatePrompt(String prompt) {
-        String processedPrompt = "Translate the following text into English unless it is in English: " + prompt;
+        String processedPrompt = prepromptForTranslation + prompt;
         TranslatorRequest request = new TranslatorRequest(model,
                 List.of(new TranslatorMessage("user", processedPrompt)),
                 maxCompletions,

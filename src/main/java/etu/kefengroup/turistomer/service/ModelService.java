@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -38,11 +39,12 @@ public class ModelService {
     }
 
     public Prediction sendPromptToModel(Prompt prompt){
-        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
-        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
-        log.info("Translated Prompt: " + englishPromptAsString);
-
-        prompt.setPrompt(englishPromptAsString);
+//        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
+//        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
+//        String processedPrompt = removePunctuation(englishPromptAsString);
+//        log.info("Translated Prompt: " + processedPrompt);
+//
+//        prompt.setPrompt(processedPrompt);
 
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
         ResponseEntity<Prediction> response = restTemplate.exchange(
@@ -54,6 +56,14 @@ public class ModelService {
 
         log.info("Prediction response: " + response.getBody());
         return response.getBody();
+    }
+
+    public static String removePunctuation(String input) {
+        // Define a regular expression pattern to match all punctuation characters
+        Pattern pattern = Pattern.compile("\\p{Punct}");
+
+        // Replace all occurrences of punctuation characters with an empty string
+        return input.replaceAll(pattern.toString(), "");
     }
 
     public List<? extends RecommendationEntity> getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
