@@ -33,4 +33,10 @@ public class ModelRestController {
 
         return null;
     }
+
+    @PostMapping("/reset")
+    public void resetPredictionChain(){
+        log.info("Prediction Chain deleted");
+        modelService.resetPrediction();
+    }
 }

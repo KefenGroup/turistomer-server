@@ -56,24 +56,20 @@ public class ModelService {
     }
 
     public static String removePunctuation(String input) {
-        // Define a regular expression pattern to match all punctuation characters
         Pattern pattern = Pattern.compile("\\p{Punct}");
-
-        // Replace all occurrences of punctuation characters with an empty string
         return input.replaceAll(pattern.toString(), "");
     }
 
     public RecommendationDTO getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
-        RecommendationDTO recommendationDTO = new RecommendationDTO();
-        recommendationDTO.setPrediction(prediction);
-        recommendationDTO.setRecommendations(restaurantService.findByPrediction(prediction, coordinates));
-        return recommendationDTO;
+        return restaurantService.findByPrediction(prediction, coordinates);
     }
 
     public RecommendationDTO getHotelRecommendations(Prediction prediction, Coordinates coordinates){
-        RecommendationDTO recommendationDTO = new RecommendationDTO();
-        recommendationDTO.setPrediction(prediction);
-        recommendationDTO.setRecommendations(hotelService.findByPrediction(prediction, coordinates));
-        return recommendationDTO;
+        return hotelService.findByPrediction(prediction, coordinates);
+    }
+
+    public void resetPrediction(){
+        restaurantService.resetPrediction();
+        hotelService.resetPrediction();
     }
 }

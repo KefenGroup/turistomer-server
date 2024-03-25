@@ -6,6 +6,7 @@
 
     @Getter @Setter
     @ToString
+    @NoArgsConstructor
     @AllArgsConstructor
     public class Prediction {
         private List<String> cuisine;

@@ -1,5 +1,6 @@
 package etu.kefengroup.turistomer.service;
 
+import etu.kefengroup.turistomer.dto.RecommendationDTO;
 import etu.kefengroup.turistomer.entity.Restaurant;
 import etu.kefengroup.turistomer.dto.Coordinates;
 import etu.kefengroup.turistomer.dto.Prediction;
@@ -20,5 +21,7 @@ public interface RestaurantService {
 
     int getCount();
 
-    List<Restaurant> findByPrediction(Prediction prediction, Coordinates coordinates);
+    RecommendationDTO findByPrediction(Prediction prediction, Coordinates coordinates);
+
+    void resetPrediction();
 }
