@@ -1,10 +1,7 @@
 package etu.kefengroup.turistomer.service;
 
-import etu.kefengroup.turistomer.dto.TranslatorResponse;
+import etu.kefengroup.turistomer.dto.*;
 import etu.kefengroup.turistomer.entity.RecommendationEntity;
-import etu.kefengroup.turistomer.dto.Coordinates;
-import etu.kefengroup.turistomer.dto.Prediction;
-import etu.kefengroup.turistomer.dto.Prompt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,11 +63,17 @@ public class ModelService {
         return input.replaceAll(pattern.toString(), "");
     }
 
-    public List<? extends RecommendationEntity> getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
-        return restaurantService.findByPrediction(prediction, coordinates);
+    public RecommendationDTO getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
+        RecommendationDTO recommendationDTO = new RecommendationDTO();
+        recommendationDTO.setPrediction(prediction);
+        recommendationDTO.setRecommendations(restaurantService.findByPrediction(prediction, coordinates));
+        return recommendationDTO;
     }
 
-    public List<? extends RecommendationEntity> getHotelRecommendations(Prediction prediction, Coordinates coordinates){
-        return hotelService.findByPrediction(prediction, coordinates);
+    public RecommendationDTO getHotelRecommendations(Prediction prediction, Coordinates coordinates){
+        RecommendationDTO recommendationDTO = new RecommendationDTO();
+        recommendationDTO.setPrediction(prediction);
+        recommendationDTO.setRecommendations(hotelService.findByPrediction(prediction, coordinates));
+        return recommendationDTO;
     }
 }

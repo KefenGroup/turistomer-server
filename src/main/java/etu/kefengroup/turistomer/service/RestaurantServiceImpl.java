@@ -131,7 +131,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     private void findByPredictionCloseHelper(Coordinates coordinates) {
-        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),2);
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
 
         if(restaurantRecommendations.isEmpty()){
             restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByLocationRange(

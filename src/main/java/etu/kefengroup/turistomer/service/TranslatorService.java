@@ -34,12 +34,12 @@ public class TranslatorService {
 
     // TODO handle preprompt to work as expected
     private final String prepromptForTranslation = "Please ignore all previous instructions. " +
-            "Please respond only in English. Do not explain what you are doing. Do not self reference. You are an expert translator. "+
-            "Do not change the text if it is in English" +
-            "Translate the following text to English:\n";
+            "Please respond only in the english language. Do not explain what you are doing. " +
+            "Do not self reference. You are an expert translator. Translate the following text to the english. " +
+            "The text to be translated is ";
 
     public TranslatorResponse translatePrompt(String prompt) {
-        String processedPrompt = prepromptForTranslation + prompt;
+        String processedPrompt = prepromptForTranslation + "\"" + prompt + "\"";
         TranslatorRequest request = new TranslatorRequest(model,
                 List.of(new TranslatorMessage("user", processedPrompt)),
                 maxCompletions,
