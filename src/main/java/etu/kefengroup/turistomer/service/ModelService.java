@@ -1,7 +1,6 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.dto.*;
-import etu.kefengroup.turistomer.entity.RecommendationEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -35,7 +33,7 @@ public class ModelService {
         this.translatorService = translatorService;
     }
 
-    public Prediction sendPromptToModel(Prompt prompt){
+    public Filter sendPromptToModel(Prompt prompt){
 //        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
 //        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
 //        String processedPrompt = removePunctuation(englishPromptAsString);
@@ -44,11 +42,11 @@ public class ModelService {
 //        prompt.setPrompt(processedPrompt);
 
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
-        ResponseEntity<Prediction> response = restTemplate.exchange(
+        ResponseEntity<Filter> response = restTemplate.exchange(
                 modelApiUrl,
                 HttpMethod.POST,
                 requestEntity,
-                Prediction.class
+                Filter.class
         );
 
         log.info("Prediction response: " + response.getBody());
@@ -60,12 +58,12 @@ public class ModelService {
         return input.replaceAll(pattern.toString(), "");
     }
 
-    public RecommendationDTO getRestaurantRecommendations(Prediction prediction, Coordinates coordinates){
-        return restaurantService.findByPrediction(prediction, coordinates);
+    public RecommendationDTO getRestaurantRecommendations(Filter filter, Coordinates coordinates){
+        return restaurantService.findByPrediction(filter, coordinates);
     }
 
-    public RecommendationDTO getHotelRecommendations(Prediction prediction, Coordinates coordinates){
-        return hotelService.findByPrediction(prediction, coordinates);
+    public RecommendationDTO getHotelRecommendations(Filter filter, Coordinates coordinates){
+        return hotelService.findByPrediction(filter, coordinates);
     }
 
     public void resetPrediction(){

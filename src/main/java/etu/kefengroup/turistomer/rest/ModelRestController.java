@@ -1,7 +1,7 @@
 package etu.kefengroup.turistomer.rest;
 
 import etu.kefengroup.turistomer.dto.RecommendationDTO;
-import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.dto.Prompt;
 import etu.kefengroup.turistomer.service.ModelService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ public class ModelRestController {
     @PostMapping
     public RecommendationDTO getPrompt(@RequestBody Prompt prompt){
         log.info("Got prompt: " + prompt);
-        Prediction prediction = modelService.sendPromptToModel(prompt);
+        Filter filter = modelService.sendPromptToModel(prompt);
         if(prompt.getType().equals("restaurant")){
-            return modelService.getRestaurantRecommendations(prediction, prompt.getCoordinates());
+            return modelService.getRestaurantRecommendations(filter, prompt.getCoordinates());
         }else if (prompt.getType().equals("hotel")){
-            return modelService.getHotelRecommendations(prediction, prompt.getCoordinates());
+            return modelService.getHotelRecommendations(filter, prompt.getCoordinates());
         }
 
         return null;

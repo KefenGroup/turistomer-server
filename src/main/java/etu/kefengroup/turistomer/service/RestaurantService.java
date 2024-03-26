@@ -3,7 +3,7 @@ package etu.kefengroup.turistomer.service;
 import etu.kefengroup.turistomer.dto.RecommendationDTO;
 import etu.kefengroup.turistomer.entity.Restaurant;
 import etu.kefengroup.turistomer.dto.Coordinates;
-import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Filter;
 
 import java.util.List;
 
@@ -21,7 +21,8 @@ public interface RestaurantService {
 
     int getCount();
 
-    RecommendationDTO findByPrediction(Prediction prediction, Coordinates coordinates);
+    RecommendationDTO findByPrediction(Filter filter, Coordinates coordinates);
 
+    List<Restaurant> findRestaurantsByFilters(Filter filter);
     void resetPrediction();
 }

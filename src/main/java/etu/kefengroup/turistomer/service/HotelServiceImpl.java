@@ -4,7 +4,7 @@ import etu.kefengroup.turistomer.dao.HotelRepository;
 import etu.kefengroup.turistomer.dto.RecommendationDTO;
 import etu.kefengroup.turistomer.entity.Hotel;
 import etu.kefengroup.turistomer.dto.Coordinates;
-import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
 import etu.kefengroup.turistomer.utils.EnglishToTurkishMappings;
 import etu.kefengroup.turistomer.utils.GeoLocation;
@@ -25,12 +25,12 @@ public class HotelServiceImpl implements HotelService{
     private HotelRepository hotelRepository;
 
     private List<Hotel> hotelRecommendations;
-    private Prediction chainedPrediction;
+    private Filter chainedFilter;
 
     @Autowired
     public HotelServiceImpl(HotelRepository hotelRepository) {
         this.hotelRepository = hotelRepository;
-        chainedPrediction = new Prediction();
+        chainedFilter = new Filter();
     }
 
     @Override
@@ -75,67 +75,67 @@ public class HotelServiceImpl implements HotelService{
     }
 
     @Override
-    public RecommendationDTO findByPrediction(Prediction prediction, Coordinates coordinates) {
-        updateChainedPrediction(prediction);
+    public RecommendationDTO findByPrediction(Filter filter, Coordinates coordinates) {
+        updateChainedPrediction(filter);
         hotelRecommendations = new ArrayList<>();
 
-        if(prediction.getAmenity() != null){
-            hotelRecommendations.addAll(findByPredictionAmenityHelper(prediction.getAmenity()));
+        if(filter.getAmenity() != null){
+            hotelRecommendations.addAll(findByPredictionAmenityHelper(filter.getAmenity()));
         }
 
-        if(prediction.getIsClose() != null && !prediction.getIsClose().contains(1)){
-            findByPredictionLocationHelper(prediction.getLocation());
+        if(filter.getIsClose() != null && !filter.getIsClose().contains(1)){
+            findByPredictionLocationHelper(filter.getLocation());
         }
 
-        if((prediction.getCuisine() == null && prediction.getLocation() == null)
-                || (prediction.getIsClose() != null && prediction.getIsClose().contains(1))){
+        if((filter.getCuisine() == null && filter.getLocation() == null)
+                || (filter.getIsClose() != null && filter.getIsClose().contains(1))){
             findByPredictionCloseHelper(coordinates);
         }
 
-        if(prediction.getIsCheap() != null && prediction.getIsCheap().contains(1)
-                && (prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1))){
+        if(filter.getIsCheap() != null && filter.getIsCheap().contains(1)
+                && (filter.getIsExpensive() != null && filter.getIsExpensive().contains(1))){
             findByPredictionCheapHelper(3000);
         }
 
-        if(prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1)){
+        if(filter.getIsExpensive() != null && filter.getIsExpensive().contains(1)){
             findByPredictionExpensiveHelper(5000);
         }
 
-        return new RecommendationDTO(chainedPrediction, hotelRecommendations);
+        return new RecommendationDTO(chainedFilter, hotelRecommendations);
     }
 
     @Override
     public void resetPrediction() {
-        chainedPrediction = new Prediction();
+        chainedFilter = new Filter();
     }
 
-    private void updateChainedPrediction(Prediction newPrediction){
-        if (newPrediction.getCuisine() != null && !newPrediction.getCuisine().equals(chainedPrediction.getCuisine())) {
-            chainedPrediction.setCuisine(newPrediction.getCuisine());
+    private void updateChainedPrediction(Filter newFilter){
+        if (newFilter.getCuisine() != null && !newFilter.getCuisine().equals(chainedFilter.getCuisine())) {
+            chainedFilter.setCuisine(newFilter.getCuisine());
         }
-        if (newPrediction.getLocation() != null && !newPrediction.getLocation().equals(chainedPrediction.getLocation())) {
-            chainedPrediction.setLocation(newPrediction.getLocation());
+        if (newFilter.getLocation() != null && !newFilter.getLocation().equals(chainedFilter.getLocation())) {
+            chainedFilter.setLocation(newFilter.getLocation());
         }
-        if (newPrediction.getMeal() != null && !newPrediction.getMeal().equals(chainedPrediction.getMeal())) {
-            chainedPrediction.setMeal(newPrediction.getMeal());
+        if (newFilter.getMeal() != null && !newFilter.getMeal().equals(chainedFilter.getMeal())) {
+            chainedFilter.setMeal(newFilter.getMeal());
         }
-        if (newPrediction.getIsClose() != null && !newPrediction.getIsClose().equals(chainedPrediction.getIsClose())) {
-            chainedPrediction.setIsClose(newPrediction.getIsClose());
+        if (newFilter.getIsClose() != null && !newFilter.getIsClose().equals(chainedFilter.getIsClose())) {
+            chainedFilter.setIsClose(newFilter.getIsClose());
         }
-        if (newPrediction.getPrice() != null && !newPrediction.getPrice().equals(chainedPrediction.getPrice())) {
-            chainedPrediction.setPrice(newPrediction.getPrice());
+        if (newFilter.getPrice() != null && !newFilter.getPrice().equals(chainedFilter.getPrice())) {
+            chainedFilter.setPrice(newFilter.getPrice());
         }
-        if (newPrediction.getIsCheap() != null && !newPrediction.getIsCheap().equals(chainedPrediction.getIsCheap())) {
-            chainedPrediction.setIsCheap(newPrediction.getIsCheap());
+        if (newFilter.getIsCheap() != null && !newFilter.getIsCheap().equals(chainedFilter.getIsCheap())) {
+            chainedFilter.setIsCheap(newFilter.getIsCheap());
         }
-        if (newPrediction.getIsExpensive() != null && !newPrediction.getIsExpensive().equals(chainedPrediction.getIsExpensive())) {
-            chainedPrediction.setIsExpensive(newPrediction.getIsExpensive());
+        if (newFilter.getIsExpensive() != null && !newFilter.getIsExpensive().equals(chainedFilter.getIsExpensive())) {
+            chainedFilter.setIsExpensive(newFilter.getIsExpensive());
         }
-        if (newPrediction.getAmenity() != null && !newPrediction.getAmenity().equals(chainedPrediction.getAmenity())) {
-            chainedPrediction.setAmenity(newPrediction.getAmenity());
+        if (newFilter.getAmenity() != null && !newFilter.getAmenity().equals(chainedFilter.getAmenity())) {
+            chainedFilter.setAmenity(newFilter.getAmenity());
         }
-        if (newPrediction.getRating() != null && !newPrediction.getRating().equals(chainedPrediction.getRating())) {
-            chainedPrediction.setRating(newPrediction.getRating());
+        if (newFilter.getRating() != null && !newFilter.getRating().equals(chainedFilter.getRating())) {
+            chainedFilter.setRating(newFilter.getRating());
         }
     }
 
