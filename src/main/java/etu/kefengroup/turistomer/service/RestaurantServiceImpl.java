@@ -83,29 +83,32 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
 
         if(chainedFilter.getLocation() != null && chainedFilter.getIsClose() != null && !chainedFilter.getIsClose().contains(1)){
-            findByPredictionLocationHelper(chainedFilter.getLocation());
+            restaurantRecommendations = findByPredictionLocationHelper(chainedFilter.getLocation());
         }
 
-        if((chainedFilter.getCuisine() == null && chainedFilter.getLocation() == null)
-                || (chainedFilter.getIsClose() != null && chainedFilter.getIsClose().contains(1))){
-            findByPredictionCloseHelper(coordinates);
+        if((chainedFilter.getCuisine() == null || chainedFilter.getCuisine().isEmpty()) &&
+                (chainedFilter.getLocation() == null || chainedFilter.getLocation().isEmpty())){
+            restaurantRecommendations = findByPredictionCloseHelper(coordinates);
+        }
+
+        if(chainedFilter.getIsClose() != null && chainedFilter.getIsClose().contains(1)){
+            restaurantRecommendations = findByPredictionCloseHelper(restaurantRecommendations, coordinates);
         }
 
         if(chainedFilter.getMeal() != null && chainedFilter.getMeal().contains("breakfast")){
-            findByPredictionMealHelper(chainedFilter.getMeal());
+            restaurantRecommendations = findByPredictionMealHelper(chainedFilter.getMeal());
         }
 
         if(chainedFilter.getAmenity() != null){
-            findByPredictionPurposeHelper(chainedFilter.getAmenity());
+            restaurantRecommendations = findByPredictionPurposeHelper(chainedFilter.getAmenity());
         }
 
-        if(chainedFilter.getIsCheap() != null && chainedFilter.getIsCheap().contains(1)
-                && (chainedFilter.getIsExpensive() != null && chainedFilter.getIsExpensive().contains(1))){
-            findByPredictionCheapHelper(300);
+        if(chainedFilter.getIsCheap() != null && chainedFilter.getIsCheap().contains(1)){
+            restaurantRecommendations = findByPredictionCheapHelper(restaurantRecommendations ,300);
         }
 
         if(chainedFilter.getIsExpensive() != null && chainedFilter.getIsExpensive().contains(1)){
-            findByPredictionExpensiveHelper(1200);
+            restaurantRecommendations = findByPredictionExpensiveHelper(restaurantRecommendations, 1200);
         }
 
         return new RecommendationDTO(chainedFilter, restaurantRecommendations);
@@ -117,29 +120,15 @@ public class RestaurantServiceImpl implements RestaurantService{
                 filter.getMeal(), filter.getMinRating(), filter.getAmenity());
 
         if(filter.getIsClose().contains(1)){
-            GeoLocation.GeoLocationRange range = GeoLocation.getRange(filter.getCoordinates().getLatitude()
-                    ,filter.getCoordinates().getLongitude(),5);
-
-            filteredRestaurants = filteredRestaurants.stream()
-                    .filter(restaurant -> restaurant.getLatitude() >= range.getMinLatitude() && restaurant.getLatitude() <= range.getMaxLatitude() &&
-                            restaurant.getLongitude() >= range.getMinLongitude() && restaurant.getLongitude() <= range.getMaxLongitude())
-                    .toList();
+            filteredRestaurants = findByPredictionCloseHelper(filteredRestaurants, filter.getCoordinates());
         }
 
         if(filter.getIsCheap().contains(1)){
-            filteredRestaurants = filteredRestaurants.stream()
-                    .filter(restaurant -> (
-                            (restaurant.getPriceHigher() != -1 && restaurant.getPriceHigher() < 300)
-                                    || !restaurant.getPriceType().contains("expensive")))
-                    .collect(Collectors.toList());
+            filteredRestaurants = findByPredictionCheapHelper(filteredRestaurants, 300);
         }
 
         if(filter.getIsExpensive().contains(1)){
-            filteredRestaurants = filteredRestaurants.stream()
-                    .filter(restaurant ->
-                            (restaurant.getPriceLower() != -1 && restaurant.getPriceLower() > 1200)
-                                    || !restaurant.getPriceType().contains("cheap"))
-                    .collect(Collectors.toList());
+            filteredRestaurants = findByPredictionExpensiveHelper(filteredRestaurants, 1200);
         }
 
         return filteredRestaurants;
@@ -190,63 +179,71 @@ public class RestaurantServiceImpl implements RestaurantService{
         return restaurantRepository.findRestaurantsByCuisineNames(turkishList, cuisines.get(0));
     }
 
-    private void findByPredictionLocationHelper(List<String> locations) {
+    private List<Restaurant> findByPredictionLocationHelper(List<String> locations) {
         if(restaurantRecommendations.isEmpty()){
-            restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByCityList(locations));
+            return restaurantRepository.findRestaurantsByCityList(locations);
         }
         else{
-            restaurantRecommendations = restaurantRecommendations.stream()
+            return restaurantRecommendations.stream()
                     .filter(restaurant -> locations.stream()
                             .anyMatch(city -> restaurant.getCity().equals(city)))
                     .collect(Collectors.toList());
         }
     }
 
-    private void findByPredictionCloseHelper(Coordinates coordinates) {
-        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
-
-        if(restaurantRecommendations.isEmpty()){
-            restaurantRecommendations.addAll(restaurantRepository.findRestaurantsByLocationRange(
-                    range.getMinLongitude(),range.getMaxLongitude(),
-                    range.getMinLatitude(), range.getMaxLatitude()
-            ));
-        }
-        else{
-            restaurantRecommendations =restaurantRecommendations.stream()
-                    .filter(restaurant -> restaurant.getLatitude() >= range.getMinLatitude() && restaurant.getLatitude() <= range.getMaxLatitude() &&
-                            restaurant.getLongitude() >= range.getMinLongitude() && restaurant.getLongitude() <= range.getMaxLongitude())
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private void findByPredictionMealHelper(List<String> meals) {
-        restaurantRecommendations = restaurantRecommendations.stream()
+    private List<Restaurant> findByPredictionMealHelper(List<String> meals) {
+        return restaurantRecommendations.stream()
                 .filter(restaurant -> restaurant.getMeals().stream()
                         .anyMatch(meal -> meal.getName().equalsIgnoreCase("breakfast") || meal.getName().equalsIgnoreCase("brunch")))
                 .collect(Collectors.toList());
     }
 
-    private void findByPredictionPurposeHelper(List<String> purposes) {
-        restaurantRecommendations = restaurantRecommendations.stream()
+    private List<Restaurant> findByPredictionPurposeHelper(List<String> purposes) {
+        return restaurantRecommendations.stream()
                 .filter(restaurant -> purposes.stream()
                         .anyMatch(purpose -> restaurant.getPurposes().stream()
                                 .anyMatch(restaurantAmenity -> restaurantAmenity.getName().equalsIgnoreCase(purpose))))
                 .collect(Collectors.toList());
     }
 
-    private void findByPredictionCheapHelper(int higherThreshold) {
-        restaurantRecommendations = restaurantRecommendations.stream()
-                .filter(restaurant -> (
-                        (restaurant.getPriceHigher() != -1 && restaurant.getPriceHigher() < higherThreshold)
-                        || !restaurant.getPriceType().equals("expensive")))
+    private List<Restaurant> findByPredictionCloseHelper(List<Restaurant> list, Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
+
+        return list.stream()
+                .filter(restaurant -> restaurant.getLatitude() >= range.getMinLatitude() && restaurant.getLatitude() <= range.getMaxLatitude() &&
+                        restaurant.getLongitude() >= range.getMinLongitude() && restaurant.getLongitude() <= range.getMaxLongitude())
                 .collect(Collectors.toList());
+
     }
 
-    private void findByPredictionExpensiveHelper(int lowerThreshold) {
-        restaurantRecommendations = restaurantRecommendations.stream()
-                .filter(restaurant ->
-                        (restaurant.getPriceLower() != -1 && restaurant.getPriceLower() > lowerThreshold)
-                        || !restaurant.getPriceType().equals("cheap"))
-                .collect(Collectors.toList());
+    private List<Restaurant> findByPredictionCloseHelper(Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
+
+        return restaurantRepository.findRestaurantsByLocationRange(
+                range.getMinLongitude(),range.getMaxLongitude(),
+                range.getMinLatitude(), range.getMaxLatitude());
+
+    }
+
+    private List<Restaurant> findByPredictionCheapHelper(List<Restaurant> list, int higherThreshold) {
+        List<Restaurant> filteredList = new ArrayList<>();
+        for(Restaurant restaurant : list){
+            if((restaurant.getPriceHigher() != -1 && restaurant.getPriceHigher() > higherThreshold) ||
+                    !restaurant.getPriceType().contains("expensive")){
+                filteredList.add(restaurant);
+            }
+        }
+        return filteredList;
+    }
+
+    private List<Restaurant> findByPredictionExpensiveHelper(List<Restaurant> list, int lowerThreshold) {
+        List<Restaurant> filteredList = new ArrayList<>();
+        for(Restaurant restaurant : list){
+            if((restaurant.getPriceLower() != -1 && restaurant.getPriceLower() > lowerThreshold) ||
+                    !restaurant.getPriceType().contains("cheap")){
+                filteredList.add(restaurant);
+            }
+        }
+        return filteredList;
     }
 }

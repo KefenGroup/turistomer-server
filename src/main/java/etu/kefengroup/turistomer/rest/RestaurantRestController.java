@@ -58,6 +58,7 @@ public class RestaurantRestController {
 
     @PostMapping("/restaurants/filter")
     public List<Restaurant> filter(@RequestBody Filter filter){
+        restaurantService.resetPrediction();
         return restaurantService.findRestaurantsByFilters(filter);
     }
 
