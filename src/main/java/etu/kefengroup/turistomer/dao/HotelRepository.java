@@ -34,4 +34,13 @@ public interface HotelRepository extends PagingAndSortingRepository<Hotel, Integ
                                                     @Param("maxLongitude") double maxLongitude,
                                                     @Param("minLatitude") double minLatitude,
                                                     @Param("maxLatitude") double maxLatitude);
+
+    @Query("SELECT DISTINCT h FROM Hotel h " +
+            "LEFT JOIN h.amenities a " +
+            "WHERE (:amenityList IS NULL OR a.name IN :amenityList) " +
+            "AND (:cityList IS NULL OR h.city IN :cityList)" +
+            "AND (:minRating IS NULL OR h.rating >= :minRating)")
+    List<Hotel> findHotelsByFilters(@Param("amenityList") List<String> amenityList,
+                                                  @Param("cityList") List<String> cityList,
+                                                  @Param("minRating") int minRating);
 }

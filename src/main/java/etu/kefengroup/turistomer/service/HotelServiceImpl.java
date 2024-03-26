@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class HotelServiceImpl implements HotelService{
 
     private HotelRepository hotelRepository;
-
     private List<Hotel> hotelRecommendations;
     private Filter chainedFilter;
 
@@ -79,29 +78,51 @@ public class HotelServiceImpl implements HotelService{
         updateChainedPrediction(filter);
         hotelRecommendations = new ArrayList<>();
 
-        if(filter.getAmenity() != null){
+        if(chainedFilter.getAmenity() != null && !chainedFilter.getAmenity().isEmpty()){
             hotelRecommendations.addAll(findByPredictionAmenityHelper(filter.getAmenity()));
         }
 
-        if(filter.getIsClose() != null && !filter.getIsClose().contains(1)){
-            findByPredictionLocationHelper(filter.getLocation());
+        if(chainedFilter.getLocation() != null && !chainedFilter.getLocation().isEmpty()){
+            hotelRecommendations = findByPredictionLocationHelper(chainedFilter.getLocation());
         }
 
-        if((filter.getCuisine() == null && filter.getLocation() == null)
-                || (filter.getIsClose() != null && filter.getIsClose().contains(1))){
-            findByPredictionCloseHelper(coordinates);
+        if((chainedFilter.getAmenity() == null || chainedFilter.getAmenity().isEmpty())
+        && (chainedFilter.getLocation() == null || chainedFilter.getLocation().isEmpty())){
+            hotelRecommendations = findByPredictionCloseHelper(coordinates);
         }
 
-        if(filter.getIsCheap() != null && filter.getIsCheap().contains(1)
-                && (filter.getIsExpensive() != null && filter.getIsExpensive().contains(1))){
-            findByPredictionCheapHelper(3000);
+        if(chainedFilter.getIsClose() != null && chainedFilter.getIsClose().contains(1)){
+            hotelRecommendations = findByPredictionCloseHelper(hotelRecommendations, coordinates);
         }
 
-        if(filter.getIsExpensive() != null && filter.getIsExpensive().contains(1)){
-            findByPredictionExpensiveHelper(5000);
+        if(chainedFilter.getIsCheap() != null && chainedFilter.getIsCheap().contains(1)){
+            hotelRecommendations = findByPredictionCheapHelper(hotelRecommendations, 3000);
+        }
+
+        if(chainedFilter.getIsExpensive() != null && chainedFilter.getIsExpensive().contains(1)){
+            hotelRecommendations = findByPredictionExpensiveHelper(hotelRecommendations, 5000);
         }
 
         return new RecommendationDTO(chainedFilter, hotelRecommendations);
+    }
+
+    @Override
+    public List<Hotel> findHotelsByFilters(Filter filter) {
+        List<Hotel> filteredHotels = hotelRepository.findHotelsByFilters(filter.getAmenity(),filter.getLocation(),filter.getMinRating());
+
+        if(filter.getIsClose().contains(1)){
+            filteredHotels = findByPredictionCloseHelper(filteredHotels, filter.getCoordinates());
+        }
+
+        if(filter.getIsCheap().contains(1)){
+            filteredHotels = findByPredictionCheapHelper(filteredHotels, 3000);
+        }
+
+        if(filter.getIsExpensive().contains(1)){
+            filteredHotels = findByPredictionExpensiveHelper(filteredHotels, 5000);
+        }
+
+        return filteredHotels;
     }
 
     @Override
@@ -149,44 +170,43 @@ public class HotelServiceImpl implements HotelService{
         return hotelRepository.findHotelByAmenityNames(turkishList);
     }
 
-    private void findByPredictionLocationHelper(List<String> locations){
+    private List<Hotel> findByPredictionLocationHelper(List<String> locations){
         if(hotelRecommendations.isEmpty()){
-            hotelRecommendations.addAll(hotelRepository.findHotelsByCityList(locations));
+            return hotelRepository.findHotelsByCityList(locations);
         }
         else{
-            hotelRecommendations = hotelRecommendations.stream()
+            return hotelRecommendations.stream()
                     .filter(hotel -> locations.stream()
                             .anyMatch(city -> hotel.getCity().equals(city)))
                     .collect(Collectors.toList());
         }
     }
 
-    private void findByPredictionCloseHelper(Coordinates coordinates) {
+    private List<Hotel> findByPredictionCloseHelper(List<Hotel> list, Coordinates coordinates) {
         GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
 
-        if(hotelRecommendations.isEmpty()){
-            hotelRecommendations.addAll(hotelRepository.findHotelsByLocationRange(
-                    range.getMinLongitude(),range.getMaxLongitude(),
-                    range.getMinLatitude(), range.getMaxLatitude()
-            ));
-        }
-        else{
-            hotelRecommendations =hotelRecommendations.stream()
-                    .filter(hotel -> hotel.getLatitude() >= range.getMinLatitude() && hotel.getLatitude() <= range.getMaxLatitude() &&
-                            hotel.getLongitude() >= range.getMinLongitude() && hotel.getLongitude() <= range.getMaxLongitude())
-                    .collect(Collectors.toList());
-        }
+        return list.stream()
+                .filter(hotel -> hotel.getLatitude() >= range.getMinLatitude() && hotel.getLatitude() <= range.getMaxLatitude() &&
+                        hotel.getLongitude() >= range.getMinLongitude() && hotel.getLongitude() <= range.getMaxLongitude())
+                .collect(Collectors.toList());
     }
 
-    private void findByPredictionCheapHelper(int higherThreshold) {
-        hotelRecommendations = hotelRecommendations.stream()
+    private List<Hotel> findByPredictionCloseHelper(Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
+        return hotelRepository.findHotelsByLocationRange(
+                    range.getMinLongitude(),range.getMaxLongitude(),
+                    range.getMinLatitude(), range.getMaxLatitude());
+    }
+
+    private List<Hotel> findByPredictionCheapHelper(List<Hotel> list, int higherThreshold) {
+        return list.stream()
                 .filter(hotel -> (
                         (hotel.getPrice() != -1 && hotel.getPrice() < higherThreshold)))
                 .collect(Collectors.toList());
     }
 
-    private void findByPredictionExpensiveHelper(int lowerThreshold) {
-        hotelRecommendations = hotelRecommendations.stream()
+    private List<Hotel> findByPredictionExpensiveHelper(List<Hotel> list, int lowerThreshold) {
+        return list.stream()
                 .filter(hotel -> (
                         (hotel.getPrice() != -1 && hotel.getPrice() > lowerThreshold)))
                 .collect(Collectors.toList());

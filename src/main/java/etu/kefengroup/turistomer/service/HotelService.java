@@ -23,5 +23,7 @@ public interface HotelService {
 
     RecommendationDTO findByPrediction(Filter filter, Coordinates coordinates);
 
+    List<Hotel> findHotelsByFilters(Filter filter);
+
     void resetPrediction();
 }
