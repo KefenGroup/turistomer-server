@@ -95,7 +95,7 @@ public class RestaurantServiceImpl implements RestaurantService{
             restaurantRecommendations = findByPredictionCloseHelper(restaurantRecommendations, coordinates);
         }
 
-        if(chainedFilter.getMeal() != null && chainedFilter.getMeal().contains("breakfast")){
+        if(chainedFilter.getMeal() != null){
             restaurantRecommendations = findByPredictionMealHelper(chainedFilter.getMeal());
         }
 
@@ -170,13 +170,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     private List<Restaurant> findByPredictionCuisineHelper(List<String> cuisines){
-        List<String> turkishList = new ArrayList<>();
-        for(String c : cuisines){
-            if(EnglishToTurkishMappings.englishToTurkishCuisineMap.get(c) != null)
-                turkishList.add(EnglishToTurkishMappings.englishToTurkishCuisineMap.get(c));
-        }
-
-        return restaurantRepository.findRestaurantsByCuisineNames(turkishList, cuisines.get(0));
+        return restaurantRepository.findRestaurantsByCuisineNames(cuisines, cuisines.get(0));
     }
 
     private List<Restaurant> findByPredictionLocationHelper(List<String> locations) {
@@ -193,8 +187,9 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     private List<Restaurant> findByPredictionMealHelper(List<String> meals) {
         return restaurantRecommendations.stream()
-                .filter(restaurant -> restaurant.getMeals().stream()
-                        .anyMatch(meal -> meal.getName().equalsIgnoreCase("breakfast") || meal.getName().equalsIgnoreCase("brunch")))
+                .filter(restaurant -> meals.stream()
+                        .anyMatch(meal -> restaurant.getMeals().stream()
+                                .anyMatch(restaurantMeal -> restaurantMeal.getName().equalsIgnoreCase(meal))))
                 .collect(Collectors.toList());
     }
 
