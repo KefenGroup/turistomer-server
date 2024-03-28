@@ -1,5 +1,7 @@
 package etu.kefengroup.turistomer.rest;
 
+import etu.kefengroup.turistomer.dto.Coordinates;
+import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.entity.Restaurant;
 import etu.kefengroup.turistomer.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,11 @@ public class RestaurantRestController {
         Restaurant dbRestaurant = restaurantService.save(restaurant);
 
         return dbRestaurant;
+    }
+
+    @PostMapping("/restaurants/filter")
+    public List<Restaurant> filter(@RequestBody Filter filter){
+        return restaurantService.findRestaurantsByFilters(filter);
     }
 
     @PutMapping("/restaurants")

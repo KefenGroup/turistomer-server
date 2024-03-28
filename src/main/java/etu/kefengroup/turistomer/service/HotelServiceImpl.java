@@ -1,9 +1,10 @@
 package etu.kefengroup.turistomer.service;
 
 import etu.kefengroup.turistomer.dao.HotelRepository;
+import etu.kefengroup.turistomer.dto.RecommendationDTO;
 import etu.kefengroup.turistomer.entity.Hotel;
 import etu.kefengroup.turistomer.dto.Coordinates;
-import etu.kefengroup.turistomer.dto.Prediction;
+import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
 import etu.kefengroup.turistomer.utils.EnglishToTurkishMappings;
 import etu.kefengroup.turistomer.utils.GeoLocation;
@@ -22,12 +23,13 @@ import java.util.stream.Collectors;
 public class HotelServiceImpl implements HotelService{
 
     private HotelRepository hotelRepository;
-
     private List<Hotel> hotelRecommendations;
+    private Filter chainedFilter;
 
     @Autowired
     public HotelServiceImpl(HotelRepository hotelRepository) {
         this.hotelRepository = hotelRepository;
+        chainedFilter = new Filter();
     }
 
     @Override
@@ -72,32 +74,90 @@ public class HotelServiceImpl implements HotelService{
     }
 
     @Override
-    public List<Hotel> findByPrediction(Prediction prediction, Coordinates coordinates) {
+    public RecommendationDTO findByPrediction(Filter filter, Coordinates coordinates) {
+        updateChainedPrediction(filter);
         hotelRecommendations = new ArrayList<>();
 
-        if(prediction.getAmenity() != null){
-            hotelRecommendations.addAll(findByPredictionAmenityHelper(prediction.getAmenity()));
+        if(chainedFilter.getAmenity() != null && !chainedFilter.getAmenity().isEmpty()){
+            hotelRecommendations.addAll(findByPredictionAmenityHelper(filter.getAmenity()));
         }
 
-        if(prediction.getIsClose() != null && !prediction.getIsClose().contains(1)){
-            findByPredictionLocationHelper(prediction.getLocation());
+        if(chainedFilter.getLocation() != null && !chainedFilter.getLocation().isEmpty()){
+            hotelRecommendations = findByPredictionLocationHelper(chainedFilter.getLocation());
         }
 
-        if((prediction.getCuisine() == null && prediction.getLocation() == null)
-                || (prediction.getIsClose() != null && prediction.getIsClose().contains(1))){
-            findByPredictionCloseHelper(coordinates);
+        if((chainedFilter.getAmenity() == null || chainedFilter.getAmenity().isEmpty())
+        && (chainedFilter.getLocation() == null || chainedFilter.getLocation().isEmpty())){
+            hotelRecommendations = findByPredictionCloseHelper(coordinates);
         }
 
-        if(prediction.getIsCheap() != null && prediction.getIsCheap().contains(1)
-                && (prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1))){
-            findByPredictionCheapHelper(3000);
+        if(chainedFilter.getIsClose() != null && chainedFilter.getIsClose().contains(1)){
+            hotelRecommendations = findByPredictionCloseHelper(hotelRecommendations, coordinates);
         }
 
-        if(prediction.getIsExpensive() != null && prediction.getIsExpensive().contains(1)){
-            findByPredictionExpensiveHelper(5000);
+        if(chainedFilter.getIsCheap() != null && chainedFilter.getIsCheap().contains(1)){
+            hotelRecommendations = findByPredictionCheapHelper(hotelRecommendations, 3000);
         }
 
-        return hotelRecommendations;
+        if(chainedFilter.getIsExpensive() != null && chainedFilter.getIsExpensive().contains(1)){
+            hotelRecommendations = findByPredictionExpensiveHelper(hotelRecommendations, 5000);
+        }
+
+        return new RecommendationDTO(chainedFilter, hotelRecommendations);
+    }
+
+    @Override
+    public List<Hotel> findHotelsByFilters(Filter filter) {
+        List<Hotel> filteredHotels = hotelRepository.findHotelsByFilters(filter.getAmenity(),filter.getLocation(),filter.getMinRating());
+
+        if(filter.getIsClose().contains(1)){
+            filteredHotels = findByPredictionCloseHelper(filteredHotels, filter.getCoordinates());
+        }
+
+        if(filter.getIsCheap().contains(1)){
+            filteredHotels = findByPredictionCheapHelper(filteredHotels, 3000);
+        }
+
+        if(filter.getIsExpensive().contains(1)){
+            filteredHotels = findByPredictionExpensiveHelper(filteredHotels, 5000);
+        }
+
+        return filteredHotels;
+    }
+
+    @Override
+    public void resetPrediction() {
+        chainedFilter = new Filter();
+    }
+
+    private void updateChainedPrediction(Filter newFilter){
+        if (newFilter.getCuisine() != null && !newFilter.getCuisine().equals(chainedFilter.getCuisine())) {
+            chainedFilter.setCuisine(newFilter.getCuisine());
+        }
+        if (newFilter.getLocation() != null && !newFilter.getLocation().equals(chainedFilter.getLocation())) {
+            chainedFilter.setLocation(newFilter.getLocation());
+        }
+        if (newFilter.getMeal() != null && !newFilter.getMeal().equals(chainedFilter.getMeal())) {
+            chainedFilter.setMeal(newFilter.getMeal());
+        }
+        if (newFilter.getIsClose() != null && !newFilter.getIsClose().equals(chainedFilter.getIsClose())) {
+            chainedFilter.setIsClose(newFilter.getIsClose());
+        }
+        if (newFilter.getPrice() != null && !newFilter.getPrice().equals(chainedFilter.getPrice())) {
+            chainedFilter.setPrice(newFilter.getPrice());
+        }
+        if (newFilter.getIsCheap() != null && !newFilter.getIsCheap().equals(chainedFilter.getIsCheap())) {
+            chainedFilter.setIsCheap(newFilter.getIsCheap());
+        }
+        if (newFilter.getIsExpensive() != null && !newFilter.getIsExpensive().equals(chainedFilter.getIsExpensive())) {
+            chainedFilter.setIsExpensive(newFilter.getIsExpensive());
+        }
+        if (newFilter.getAmenity() != null && !newFilter.getAmenity().equals(chainedFilter.getAmenity())) {
+            chainedFilter.setAmenity(newFilter.getAmenity());
+        }
+        if (newFilter.getRating() != null && !newFilter.getRating().equals(chainedFilter.getRating())) {
+            chainedFilter.setRating(newFilter.getRating());
+        }
     }
 
     private List<Hotel> findByPredictionAmenityHelper(List<String> amenities){
@@ -110,44 +170,43 @@ public class HotelServiceImpl implements HotelService{
         return hotelRepository.findHotelByAmenityNames(turkishList);
     }
 
-    private void findByPredictionLocationHelper(List<String> locations){
+    private List<Hotel> findByPredictionLocationHelper(List<String> locations){
         if(hotelRecommendations.isEmpty()){
-            hotelRecommendations.addAll(hotelRepository.findHotelsByCityList(locations));
+            return hotelRepository.findHotelsByCityList(locations);
         }
         else{
-            hotelRecommendations = hotelRecommendations.stream()
+            return hotelRecommendations.stream()
                     .filter(hotel -> locations.stream()
                             .anyMatch(city -> hotel.getCity().equals(city)))
                     .collect(Collectors.toList());
         }
     }
 
-    private void findByPredictionCloseHelper(Coordinates coordinates) {
-        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),2);
+    private List<Hotel> findByPredictionCloseHelper(List<Hotel> list, Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
 
-        if(hotelRecommendations.isEmpty()){
-            hotelRecommendations.addAll(hotelRepository.findHotelsByLocationRange(
-                    range.getMinLongitude(),range.getMaxLongitude(),
-                    range.getMinLatitude(), range.getMaxLatitude()
-            ));
-        }
-        else{
-            hotelRecommendations =hotelRecommendations.stream()
-                    .filter(hotel -> hotel.getLatitude() >= range.getMinLatitude() && hotel.getLatitude() <= range.getMaxLatitude() &&
-                            hotel.getLongitude() >= range.getMinLongitude() && hotel.getLongitude() <= range.getMaxLongitude())
-                    .collect(Collectors.toList());
-        }
+        return list.stream()
+                .filter(hotel -> hotel.getLatitude() >= range.getMinLatitude() && hotel.getLatitude() <= range.getMaxLatitude() &&
+                        hotel.getLongitude() >= range.getMinLongitude() && hotel.getLongitude() <= range.getMaxLongitude())
+                .collect(Collectors.toList());
     }
 
-    private void findByPredictionCheapHelper(int higherThreshold) {
-        hotelRecommendations = hotelRecommendations.stream()
+    private List<Hotel> findByPredictionCloseHelper(Coordinates coordinates) {
+        GeoLocation.GeoLocationRange range = GeoLocation.getRange(coordinates.getLatitude(),coordinates.getLongitude(),5);
+        return hotelRepository.findHotelsByLocationRange(
+                    range.getMinLongitude(),range.getMaxLongitude(),
+                    range.getMinLatitude(), range.getMaxLatitude());
+    }
+
+    private List<Hotel> findByPredictionCheapHelper(List<Hotel> list, int higherThreshold) {
+        return list.stream()
                 .filter(hotel -> (
                         (hotel.getPrice() != -1 && hotel.getPrice() < higherThreshold)))
                 .collect(Collectors.toList());
     }
 
-    private void findByPredictionExpensiveHelper(int lowerThreshold) {
-        hotelRecommendations = hotelRecommendations.stream()
+    private List<Hotel> findByPredictionExpensiveHelper(List<Hotel> list, int lowerThreshold) {
+        return list.stream()
                 .filter(hotel -> (
                         (hotel.getPrice() != -1 && hotel.getPrice() > lowerThreshold)))
                 .collect(Collectors.toList());

@@ -36,5 +36,19 @@ public interface RestaurantRepository extends PagingAndSortingRepository<Restaur
                                                     @Param("minLatitude") double minLatitude,
                                                     @Param("maxLatitude") double maxLatitude);
 
+    @Query("SELECT DISTINCT r FROM Restaurant r " +
+            "LEFT JOIN r.cuisines c " +
+            "LEFT JOIN r.meals m " +
+            "LEFT JOIN r.purposes p " +
+            "WHERE (:cuisineNames IS NULL OR c.name IN :cuisineNames) " +
+            "AND (:cityList IS NULL OR r.city IN :cityList)" +
+            "AND (:mealList IS NULL OR m.name IN :mealList)" +
+            "AND (:minRating IS NULL OR r.rating >= :minRating)" +
+            "AND (:purposeList IS NULL OR p.name IN :purposeList)")
+    List<Restaurant> findRestaurantsByFilters(@Param("cuisineNames") List<String> cuisineNames,
+                                              @Param("cityList") List<String> cityList,
+                                              @Param("mealList") List<String> mealList,
+                                              @Param("minRating") int minRating,
+                                              @Param("purposeList") List<String> purposeList);
 
 }

@@ -11,6 +11,6 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class RecommendationDTO {
-    Prediction prediction;
+    Filter filter;
     List<? extends RecommendationEntity> recommendations;
 }
