@@ -1,5 +1,6 @@
 package etu.kefengroup.turistomer.rest;
 
+import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.entity.Hotel;
 import etu.kefengroup.turistomer.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ public class HotelRestController {
     @GetMapping("/hotels")
     public List<Hotel> findAll(){
         return hotelService.findAll();
+    }
+
+    @PostMapping("/hotels/filter")
+    public List<Hotel> filter(@RequestBody Filter filter){
+        hotelService.resetPrediction();
+        return hotelService.findHotelsByFilters(filter);
     }
 
     @GetMapping("/hotels/count")
