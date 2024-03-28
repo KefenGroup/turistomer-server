@@ -1,10 +1,10 @@
-import spacy
+import spacy_universal_sentence_encoder
 import Levenshtein
 
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy_universal_sentence_encoder.load_model('en_use_lg')
 
-cuisine_list_txt_path = r'<path_to_cuisine_list>'
-hotel_amenity_list_txt_path = r'<path_to_hotel_amenity_list>'
+cuisine_list_txt_path = r'D:\TOBB\Bil496\scripts\model\word-to-vec\cuisine_list_en.txt'
+hotel_amenity_list_txt_path = r'D:\TOBB\Bil496\scripts\model\word-to-vec\all_amenities_en.txt'
 
 with open(cuisine_list_txt_path, "r", encoding='utf-8') as file:
     cuisine_list = [line.strip() for line in file]
@@ -13,7 +13,7 @@ with open(hotel_amenity_list_txt_path, "r", encoding='utf-8') as file:
     amenity_list = [line.strip() for line in file]
 
 near_list = ["nearby", "near", "close", "neighboring", "around me", "close to my current location", "in area"]
-cheap_list = ["cheap", "economical", "affordable" ,"low cost", "low priced"]
+cheap_list = ["cheap", "economical", "affordable" ,"low cost", "low priced", "budget friendly"]
 expensive_list = ["expensive", "luxurious", "costly", "high cost", "overpriced"]
 meal_list = ["breakfast", "dinner", "lunch", "brunch"]
 city_list = ["Nevşehir","Bursa","Çanakkale","İzmir","Antalya","Ankara","Aydın","Balıkesir","Muğla","Istanbul"]
