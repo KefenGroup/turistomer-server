@@ -32,7 +32,6 @@ public class TranslatorService {
     @Value("${openai.chatgpt.api.url}")
     private String apiUrl;
 
-    // TODO handle preprompt to work as expected
     private final String prepromptForTranslation = "Please ignore all previous instructions. " +
             "Please respond only in the english language. Do not explain what you are doing. " +
             "Do not self reference. You are an expert translator. Translate the following text to the english. " +

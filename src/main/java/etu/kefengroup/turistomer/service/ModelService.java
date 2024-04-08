@@ -34,12 +34,12 @@ public class ModelService {
     }
 
     public Filter sendPromptToModel(Prompt prompt){
-//        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
-//        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
-//        String processedPrompt = removePunctuation(englishPromptAsString);
-//        log.info("Translated Prompt: " + processedPrompt);
-//
-//        prompt.setPrompt(processedPrompt);
+        TranslatorResponse translatedPrompt = translatorService.translatePrompt(prompt.getPrompt());
+        String englishPromptAsString = translatedPrompt.getChoices().get(0).getMessage().getContent();
+        String processedPrompt = removePunctuation(englishPromptAsString);
+        log.info("Translated Prompt: " + processedPrompt);
+
+        prompt.setPrompt(processedPrompt);
 
         HttpEntity<Prompt> requestEntity = new HttpEntity<>(prompt);
         ResponseEntity<Filter> response = restTemplate.exchange(
