@@ -6,7 +6,6 @@ import etu.kefengroup.turistomer.entity.Hotel;
 import etu.kefengroup.turistomer.dto.Coordinates;
 import etu.kefengroup.turistomer.dto.Filter;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
-import etu.kefengroup.turistomer.utils.EnglishToTurkishMappings;
 import etu.kefengroup.turistomer.utils.GeoLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -161,13 +160,7 @@ public class HotelServiceImpl implements HotelService{
     }
 
     private List<Hotel> findByPredictionAmenityHelper(List<String> amenities){
-        List<String> turkishList = new ArrayList<>();
-        for(String a : amenities){
-            if(EnglishToTurkishMappings.englishToTurkishAmenityMap.get(a) != null)
-                turkishList.add(EnglishToTurkishMappings.englishToTurkishAmenityMap.get(a));
-        }
-
-        return hotelRepository.findHotelByAmenityNames(turkishList);
+        return hotelRepository.findHotelByAmenityNames(amenities);
     }
 
     private List<Hotel> findByPredictionLocationHelper(List<String> locations){

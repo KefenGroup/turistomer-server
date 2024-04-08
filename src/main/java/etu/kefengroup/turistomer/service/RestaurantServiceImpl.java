@@ -5,7 +5,6 @@ import etu.kefengroup.turistomer.dto.RecommendationDTO;
 import etu.kefengroup.turistomer.entity.Restaurant;
 import etu.kefengroup.turistomer.dto.Coordinates;
 import etu.kefengroup.turistomer.dto.Filter;
-import etu.kefengroup.turistomer.utils.EnglishToTurkishMappings;
 import etu.kefengroup.turistomer.rest.EntityNotFoundException;
 import etu.kefengroup.turistomer.utils.GeoLocation;
 import org.springframework.beans.factory.annotation.Autowired;

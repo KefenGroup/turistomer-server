@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from typing import List, Optional
 from pydantic import BaseModel
 import uvicorn
-import TuristOmerSimilarityModelFineTuned as sim
+import TuristOmerSimilarityModel as sim
 
 class Coordinates(BaseModel):
     longitude: float
